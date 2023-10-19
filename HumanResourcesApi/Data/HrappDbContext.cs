@@ -33,7 +33,6 @@ public partial class HrappDbContext : DbContext
     public virtual DbSet<EmployeeProject> EmployeesProjects { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost;Database=HRapp;Integrated Security=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -105,7 +104,7 @@ public partial class HrappDbContext : DbContext
             entity.Property(e => e.JobName)
                 .HasMaxLength(30)
                 .IsUnicode(false);
-            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            //entity.Property(e => e.StartDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Salary).WithMany(p => p.JobTitles)
                 .HasForeignKey(d => d.SalaryId)

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
+using HumanResourcesApi.Models.ApiModels;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -51,7 +52,6 @@ namespace HumanResourcesApi.Controllers
         }
 
         // PUT: api/JobTitles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutJobTitle(int id, JobTitle jobTitle)
         {
@@ -82,18 +82,21 @@ namespace HumanResourcesApi.Controllers
         }
 
         // POST: api/JobTitles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<JobTitle>> PostJobTitle(JobTitle jobTitle)
+        public async Task<ActionResult<JobTitle>> PostJobTitle(JobTitleDTO jobTitle)
         {
-          if (_context.JobTitles == null)
-          {
-              return Problem("Entity set 'HrappDbContext.JobTitles'  is null.");
-          }
-            _context.JobTitles.Add(jobTitle);
+            JobTitle newJobTitle = new JobTitle()
+            {
+                JobName = jobTitle.JobName,
+                Salary = new Salary { Amount=jobTitle.Salary },
+                WorkingHours = jobTitle.WorkingHours
+                //StartDate = Convert.ToDateTime(jobTitle.StartDate)
+            };
+
+            _context.JobTitles.Add(newJobTitle);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetJobTitle", new { id = jobTitle.JobTitleId }, jobTitle);
+            return Ok(newJobTitle);
         }
 
         // DELETE: api/JobTitles/5

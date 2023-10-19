@@ -14,7 +14,7 @@ public partial class JobTitle
 
     public int WorkingHours { get; set; }
 
-    public DateTime? StartDate { get; set; }
+    //public DateTime? StartDate { get; set; }
 
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 

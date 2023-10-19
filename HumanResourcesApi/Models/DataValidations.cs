@@ -24,5 +24,13 @@ namespace HumanResourcesApi.Models
 
         //Department
         public const int DepartmentMaxLength = 15;
+
+        //Absence
+        public const int StatusMaxLength = 10;
+        public const int TypeOfAbsenceMaxLength = 15;
+        public const int ReasonMaxLength = 100;
+
+        //JobTitle
+        public const int JobNameMaxLength = 27;
     }
 }

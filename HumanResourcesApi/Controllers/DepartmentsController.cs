@@ -11,7 +11,7 @@ using HumanResourcesApi.Models.ApiModels;
 
 namespace HumanResourcesApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class DepartmentsController : ControllerBase
     {

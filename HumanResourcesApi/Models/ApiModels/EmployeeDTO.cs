@@ -29,7 +29,7 @@ namespace HumanResourcesApi.Models.ApiModels
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = isRequired)]
         public string JobTitle { get; set; } = null!;
 
-        public DateTime HireDate { get; set; }
+        //public DateTime HireDate { get; set; }
 
         [MaxLength(AdressMaxLength)]
         public string Adress { get; set; } = null!;
