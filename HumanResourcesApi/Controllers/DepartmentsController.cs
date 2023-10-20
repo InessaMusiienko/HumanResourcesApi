@@ -34,15 +34,16 @@ namespace HumanResourcesApi.Controllers
             return await _context.Departments.ToListAsync();
         }
 
-        // GET: api/Departments/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(int id)
+        // GET: api/Departments/departmentName
+        [HttpGet("{departmentName}")]
+        public async Task<ActionResult<Department>> GetDepartment(string departmentName)
         {
           if (_context.Departments == null)
           {
               return NotFound();
           }
-            var department = await _context.Departments.FindAsync(id);
+            var department = await _context.Departments.Include(x=>x.Employees)
+                .FirstOrDefaultAsync(x => x.DepartmentName.ToLower() == departmentName.ToLower());
 
             if (department == null)
             {
@@ -98,15 +99,17 @@ namespace HumanResourcesApi.Controllers
             return Ok(newDepartment);
         }
 
-        // DELETE: api/Departments/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDepartment(int id)
+        // DELETE: api/Departments/departmentName
+
+        [HttpDelete("{departmentName}")]
+        public async Task<IActionResult> DeleteDepartment(string departmentName)
         {
             if (_context.Departments == null)
             {
                 return NotFound();
             }
-            var department = await _context.Departments.FindAsync(id);
+            var department = await _context.Departments
+                .FirstOrDefaultAsync(x => x.DepartmentName.ToLower() == departmentName.ToLower());
             if (department == null)
             {
                 return NotFound();

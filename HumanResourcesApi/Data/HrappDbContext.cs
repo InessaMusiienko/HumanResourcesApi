@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using HumanResourcesApi.Models.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HumanResourcesApi.Data;
 
-public partial class HrappDbContext : DbContext
+public partial class HrappDbContext : IdentityDbContext<ApiUser>
 {
     public HrappDbContext()
     {
@@ -37,6 +38,8 @@ public partial class HrappDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Absence>(entity =>
         {
             entity.HasKey(e => e.AbsenceId).HasName("PK__Absences__93818888A3EFEBBD");

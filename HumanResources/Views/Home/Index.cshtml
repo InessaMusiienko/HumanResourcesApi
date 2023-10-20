@@ -11,20 +11,24 @@
         <div class="row mb-5">
             <div class="col-12 col-sm-6 col-md-3 m-auto">
                 <!-- card starts here -->
+                <a asp-controller="Employee" asp-action="GetAllEmployees" class='btn'>
                 <div class="card shadow">
                     <img src="~/homePage/employees.jpg" alt="" class="card-img-top">
                     <div class="card-body">
-                        <h3 class="text-center">Personal Employee Information</h3>
+                        <h3 class="text-center">Employee Information</h3>
                         <hr class="mx-auto w-75">
                         <p>
                             Personal employee information and contact details.
                         </p>
                     </div>
                 </div>
+                </a>
+                
                 <!-- card ends here -->
             </div>
             <!-- col ends here -->
             <div class="col-12 col-sm-6 col-md-3 m-auto">
+                <a asp-controller="Department" asp-action="GetAllDepartments" class='btn'>
                 <!-- card starts here -->
                 <div class="card shadow">
                     <img src="~/homePage/absences.jpeg" alt="" class="card-img-top">
@@ -36,6 +40,7 @@
                         </p>
                     </div>
                 </div>
+                </a>
                 <!-- card ends here -->
             </div>
             <!-- col ends here -->

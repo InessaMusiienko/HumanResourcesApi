@@ -4,30 +4,30 @@ using Newtonsoft.Json;
 
 namespace HumanResources.Controllers
 {
-    public class DepartmentController : Controller
+    public class EmployeeController : Controller
     {
         Uri baseAddress = new Uri("https://localhost:7175/api");
         private readonly HttpClient _client;
 
-        public DepartmentController()
+        public EmployeeController()
         {
             _client = new HttpClient();
             _client.BaseAddress = baseAddress;
         }
 
         [HttpGet]
-        public IActionResult GetAllDepartments()
+        public IActionResult GetAllEmployees()
         {
-            List<DepartmentViewModel> departmentList = new List<DepartmentViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/departments/getdepartments").Result;
+            List<EmployeeViewModel> employeeList = new List<EmployeeViewModel>();
+            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/employees/GetEmployees").Result;
 
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                departmentList = JsonConvert.DeserializeObject<List<DepartmentViewModel>>(data);
+                employeeList = JsonConvert.DeserializeObject<List<EmployeeViewModel>>(data);
             }
 
-            return View(departmentList);
+            return View(employeeList);
         }
     }
 }
