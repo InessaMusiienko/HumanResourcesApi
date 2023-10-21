@@ -32,5 +32,14 @@ namespace HumanResourcesApi.Models
 
         //JobTitle
         public const int JobNameMaxLength = 27;
+
+        //Account
+        public const string EmailRegEx = @"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$";
+
+        public const int MinPasswordLength = 6;
+
+        public const string PaswordRegEx = @"^(?=.*\d)(?=.*[a-z])(?=.*[a-zA-Z]).{6,}$";
+
+        public const int UserNamesMinLength = 2;
     }
 }

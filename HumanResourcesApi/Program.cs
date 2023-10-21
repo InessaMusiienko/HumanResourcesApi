@@ -1,4 +1,5 @@
 using HumanResourcesApi.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HumanResourcesApi
@@ -32,8 +33,7 @@ namespace HumanResourcesApi
 
             app.UseAuthorization();
 
-
-            app.MapControllers();
+            app.MapControllers();         
 
             app.Run();
         }

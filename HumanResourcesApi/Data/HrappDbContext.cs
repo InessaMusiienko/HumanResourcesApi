@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HumanResourcesApi.Data;
 
-public partial class HrappDbContext : IdentityDbContext<ApiUser>
+public partial class HrappDbContext : DbContext
 {
     public HrappDbContext()
     {
