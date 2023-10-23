@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace HumanResourcesApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class EmployeesController : ControllerBase
     {

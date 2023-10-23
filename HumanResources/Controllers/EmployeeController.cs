@@ -1,9 +1,12 @@
 ﻿using HumanResources.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Data;
 
 namespace HumanResources.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         Uri baseAddress = new Uri("https://localhost:7175/api");
