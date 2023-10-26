@@ -24,14 +24,22 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments(string SearchString)
         {
           if (_context.Departments == null)
           {
               return NotFound();
           }
-          
-            return await _context.Departments.ToListAsync();
+
+            var departments = _context.Departments.ToList();
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                departments = departments.Where(d => d.DepartmentName.Contains(SearchString)).ToList();
+            }
+
+            return departments;
+            //var allDepartments = await _context.Departments.ToListAsync();
+            //return allDepartments;
         }
 
         // GET: api/Departments/departmentName

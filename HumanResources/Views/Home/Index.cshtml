@@ -27,7 +27,8 @@
                 <!-- card ends here -->
             </div>
             <!-- col ends here -->
-            <div class="col-12 col-sm-6 col-md-3 m-auto">
+            
+                <div class="col-12 col-sm-6 col-md-3 m-auto">
                 <a asp-controller="Department" asp-action="GetAllDepartments" class='btn'>
                 <!-- card starts here -->
                 <div class="card shadow">
@@ -42,9 +43,11 @@
                 </div>
                 </a>
                 <!-- card ends here -->
-            </div>
+                </div>
+            
             <!-- col ends here -->
             <div class="col-12 col-sm-6 col-md-3 m-auto">
+                <a asp-controller="Absence" asp-action="GetAllAbsences" class='btn'>
                 <!-- card starts here -->
                 <div class="card shadow">
                     <img src="~/homePage/workingTime.png" alt="" class="card-img-top">
@@ -56,10 +59,12 @@
                         </p>
                     </div>
                 </div>
+                </a>
                 <!-- card ends here -->
             </div>
             <!-- col ends here -->
             <div class="col-12 col-sm-6 col-md-3 m-auto">
+                <a asp-controller="Project" asp-action="GetAllProjects" class='btn'>
                 <!-- card starts here -->
                 <div class="card shadow">
                     <img src="~/homePage/projects.png" alt="" class="card-img-top">
@@ -71,6 +76,7 @@
                         </p>
                     </div>
                 </div>
+                </a>
                 <!-- card ends here -->
             </div>
             <!-- col ends here -->

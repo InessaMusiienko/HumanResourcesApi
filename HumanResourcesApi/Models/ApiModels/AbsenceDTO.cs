@@ -7,12 +7,6 @@ namespace HumanResourcesApi.Models.ApiModels
 {
     public class AbsenceDTO
     {
-        /*public int EmployeeId { get; set; }*/ //??
-
-        public string EmployeeFullName { get; set; } = null!;     
-
-        [MaxLength(StatusMaxLength)]
-        public string Status { get; set; } = null!;
 
         [MaxLength(TypeOfAbsenceMaxLength)]
         public string TypeOfAbsence { get; set; } = null!;
@@ -25,6 +19,5 @@ namespace HumanResourcesApi.Models.ApiModels
 
         [MaxLength(ReasonMaxLength)]
         public string? Reason { get; set; }
-
     }
 }

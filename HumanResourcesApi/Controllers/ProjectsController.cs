@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
+using HumanResourcesApi.Models.ApiModels;
 
 namespace HumanResourcesApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProjectsController : ControllerBase
     {
@@ -82,16 +83,34 @@ namespace HumanResourcesApi.Controllers
 
         // POST: api/Projects
         [HttpPost]
-        public async Task<ActionResult<Project>> PostProject(Project project)
+        public async Task<ActionResult<Project>> PostProject(ProjectDTO project)
         {
-          if (_context.Projects == null)
-          {
-              return Problem("Entity set 'HrappDbContext.Projects'  is null.");
-          }
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
+            if (new string[] { project.ProjectName, project.Duration.ToString(), project.Status }.Any(x => string.IsNullOrEmpty(x)))
+            {
+                return BadRequest();
+            }
 
-            return CreatedAtAction("GetProject", new { id = project.ProjectId }, project);
+            var projectToAdd = new Project()
+            {
+                ProjectName = project.ProjectName,
+                Duration = project.Duration,
+                Status = project.Status,
+                StartedOn = DateTime.UtcNow,
+                EmployeesProjects = new List<EmployeeProject>()
+            };
+
+            _context.Projects.Add(projectToAdd);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("GetProjects");
         }
 
         // DELETE: api/Projects/5

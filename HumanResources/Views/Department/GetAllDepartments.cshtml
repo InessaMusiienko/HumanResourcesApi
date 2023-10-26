@@ -9,6 +9,18 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="GetAllDepartments" method="get"> 
+    <div class="form-group col-md-3">
+        <label for ="SearchString">Search by department name:</label>
+        <input type="text" name="SearchString" value="" />
+        <input type="submit" value="Search" class="btn btn-primary" />
+        </div>
+</form>
+<a asp-action="GetAllDepartments">Back to full list</a>
+<hr />
+       @*asp-controller="Department" asp-action="FilmByName" asp-route-id="@film.Id"*@
+
 <table class="table">
     <thead>
         <tr>
