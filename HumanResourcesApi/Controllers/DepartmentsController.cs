@@ -24,41 +24,21 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments(string SearchString)
+        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments(string? SearchString)
         {
           if (_context.Departments == null)
           {
               return NotFound();
           }
 
-            var departments = _context.Departments.ToList();
+            var departments = await _context.Departments.Include(d=>d.Managers).ToListAsync();
             if (!String.IsNullOrEmpty(SearchString))
             {
-                departments = departments.Where(d => d.DepartmentName.Contains(SearchString)).ToList();
+                departments = departments
+                    .Where(d => d.DepartmentName.ToLower().Contains(SearchString.ToLower())).ToList();
             }
 
             return departments;
-            //var allDepartments = await _context.Departments.ToListAsync();
-            //return allDepartments;
-        }
-
-        // GET: api/Departments/departmentName
-        [HttpGet("{departmentName}")]
-        public async Task<ActionResult<Department>> GetDepartment(string departmentName)
-        {
-          if (_context.Departments == null)
-          {
-              return NotFound();
-          }
-            var department = await _context.Departments.Include(x=>x.Employees)
-                .FirstOrDefaultAsync(x => x.DepartmentName.ToLower() == departmentName.ToLower());
-
-            if (department == null)
-            {
-                return NotFound();
-            }
-
-            return department;
         }
 
         // PUT: api/Departments/5

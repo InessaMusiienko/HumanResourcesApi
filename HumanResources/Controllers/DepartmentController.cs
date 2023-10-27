@@ -18,10 +18,10 @@ namespace HumanResources.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllDepartments()
+        public IActionResult GetAllDepartments(string SearchString="")
         {
             List<DepartmentViewModel> departmentList = new List<DepartmentViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/departments/getdepartments").Result;
+            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + $"/departments/getdepartments?searchstring={SearchString}").Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -30,6 +30,85 @@ namespace HumanResources.Controllers
             }
 
             return View(departmentList);
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateDepartment(DepartmentViewModel model)
+        {
+            try
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = _client
+                    .PostAsync(_client.BaseAddress + "/departments/postdepartment", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "Department Created.";
+                    return RedirectToAction("GetAllDepartments");
+                }
+            }
+            catch(Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+            //return View();
+            return this.RedirectToAction("GetAllDepartments");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(string departmentName)
+        {
+            try
+            {
+                DepartmentViewModel dep = new DepartmentViewModel();
+                HttpResponseMessage responseMessage = _client
+                    .GetAsync(_client.BaseAddress + "/departments/getdepartment/" + departmentName).Result;
+
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    string data = responseMessage.Content.ReadAsStringAsync().Result;
+                    dep = JsonConvert.DeserializeObject<DepartmentViewModel>(data);
+                }
+                return View(dep);
+            }
+            catch (Exception ex)
+            {
+
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }            
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(string departmentName)
+        {
+            HttpResponseMessage response = _client
+                .DeleteAsync(_client.BaseAddress + "/departments/DeleteDepartment" + departmentName).Result;
+
+            try
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "Department Deleated.";
+                    return RedirectToAction("GetAllDepartments");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                TempData["errorMessage"] = ex.Message;
+                return View();  
+            }
+            return View();
         }
     }
 }
