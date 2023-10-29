@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using HumanResources.Models;
 
 namespace HumanResources.Data
 {
@@ -9,5 +10,9 @@ namespace HumanResources.Data
             : base(options)
         {
         }
+        public DbSet<HumanResources.Models.DepartmentViewModel>? DepartmentViewModel { get; set; }
+        public DbSet<HumanResources.Models.ProjectViewModel>? ProjectViewModel { get; set; }
+        public DbSet<HumanResources.Models.AllEmployeeViewModel>? AllEmployeeViewModel { get; set; }
+        public DbSet<HumanResources.Models.AbsenceViewModel>? AbsenceViewModel { get; set; }
     }
 }

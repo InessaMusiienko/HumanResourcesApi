@@ -54,7 +54,6 @@ namespace HumanResources.Controllers
             return View();
         }
 
-
         [HttpPost]
         public IActionResult Create(AbsenceViewModel model)
         {

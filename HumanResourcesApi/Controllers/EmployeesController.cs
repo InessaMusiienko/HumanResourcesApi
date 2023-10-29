@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
 using HumanResourcesApi.Models.ApiModels;
 using System.Globalization;
+using HumanResources.Models;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -17,51 +13,88 @@ namespace HumanResourcesApi.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly HrappDbContext _context;
-
         public EmployeesController(HrappDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<AllEmployeeViewModel>>> GetEmployees()
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            return await _context.Employees.ToListAsync();
-        }
-
-        // GET: api/Employees/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
-        {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
+            if (_context.Employees == null)
             {
                 return NotFound();
             }
 
+            var employees = await _context.Employees.Select(e=> new AllEmployeeViewModel
+            {
+                Id = e.EmployeeId,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Department = e.Department.DepartmentName,
+                JobTitle = e.JobTitle.JobName,
+                Email = e.Email,
+                ContactNumber = e.ContactNumber,
+                Adress = e.Adress
+            })              
+            .ToListAsync();
+
+            return employees;
+        }
+
+        // GET: api/Employees/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AllEmployeeViewModel>> GetEmployee(int id)
+        {
+          if (_context.Employees == null)
+          {
+              return NotFound();
+          }
+
+            var employees = await _context.Employees.Select(e => new AllEmployeeViewModel
+            {
+                Id = e.EmployeeId,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Department = e.Department.DepartmentName,
+                JobTitle = e.JobTitle.JobName,
+                Email = e.Email,
+                ContactNumber = e.ContactNumber,
+                Adress = e.Adress
+            })
+              .ToListAsync();
+
+            //var employee = await _context.Employees.FirstOrDefaultAsync(e => e.ContactNumber == contactNumber);
+            var employee = employees.FirstOrDefault(e => e.Id == id);
             return employee;
         }
 
         // PUT: api/Employees/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee employee)
+        public async Task<IActionResult> PutEmployee(int id, AllEmployeeViewModel updatedEmployee)
         {
-            if (id != employee.EmployeeId)
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id);
+            if (employee==null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(employee).State = EntityState.Modified;
+            //check if null or empty
+
+            var dep = await _context.Departments
+                .FirstOrDefaultAsync(d => d.DepartmentName.ToLower() == updatedEmployee.Department.ToLower());
+            var jobtitle = await _context.JobTitles
+                .FirstOrDefaultAsync(x => x.JobName.ToLower() == updatedEmployee.JobTitle.ToLower());
+
+            if(dep ==null || jobtitle == null) { return BadRequest(); }
+
+            employee.FirstName = updatedEmployee.FirstName;
+            employee.LastName = updatedEmployee.LastName;
+            employee.Department = dep;
+            employee.JobTitle = jobtitle;
+            employee.ContactNumber = updatedEmployee.ContactNumber;
+            employee.Email = updatedEmployee.Email;
+            employee.Adress = updatedEmployee.Adress;
 
             try
             {
@@ -92,12 +125,22 @@ namespace HumanResourcesApi.Controllers
             var jobtitle = await _context.JobTitles
                 .FirstOrDefaultAsync(j => j.JobName.ToLower() == employee.JobTitle.ToLower());
 
-            //var isHireDateValid = IsValidDate(employee.HireDate.ToString());
-
             if (depart == null || jobtitle == null)
             {
                 return BadRequest();
             }
+
+            var employeeAlreadyExist = await _context.Employees
+                .FirstOrDefaultAsync(e => e.FirstName == employee.FirstName);
+            if(employeeAlreadyExist != null)
+            {
+                if (employeeAlreadyExist.LastName == employee.LastName)
+                {
+                    return BadRequest();
+                }
+            }
+
+            //var isHireDateValid = IsValidDate(employee.HireDate.ToString());            
 
             Employee newEmployee = new Employee()
             {
@@ -127,13 +170,13 @@ namespace HumanResourcesApi.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (_context.Employees == null)
             {
                 return NotFound();
             }
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id);
             if (employee == null)
             {
                 return NotFound();

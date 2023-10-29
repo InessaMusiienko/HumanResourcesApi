@@ -16,6 +16,6 @@ public partial class JobTitle
 
     //public DateTime? StartDate { get; set; }
 
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    internal virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
 }
