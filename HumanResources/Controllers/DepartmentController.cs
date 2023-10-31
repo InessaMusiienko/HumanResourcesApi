@@ -33,6 +33,28 @@ namespace HumanResources.Controllers
         }
 
         [HttpGet]
+        public IActionResult Details(string id)
+        {
+            try
+            {
+                AllEmployeeViewModel employee = new AllEmployeeViewModel();
+                HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + $"/employees/getdepartmentemployees/{id}").Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                }
+                return View(employee);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -64,51 +86,51 @@ namespace HumanResources.Controllers
             return this.RedirectToAction("GetAllDepartments");
         }
 
-        [HttpGet]
-        public IActionResult Delete(string departmentName)
-        {
-            try
-            {
-                DepartmentViewModel dep = new DepartmentViewModel();
-                HttpResponseMessage responseMessage = _client
-                    .GetAsync(_client.BaseAddress + "/departments/getdepartment/" + departmentName).Result;
+        //[HttpGet]
+        //public IActionResult Delete(string departmentName)
+        //{
+        //    try
+        //    {
+        //        DepartmentViewModel dep = new DepartmentViewModel();
+        //        HttpResponseMessage responseMessage = _client
+        //            .GetAsync(_client.BaseAddress + "/departments/getdepartment/" + departmentName).Result;
 
-                if (responseMessage.IsSuccessStatusCode)
-                {
-                    string data = responseMessage.Content.ReadAsStringAsync().Result;
-                    dep = JsonConvert.DeserializeObject<DepartmentViewModel>(data);
-                }
-                return View(dep);
-            }
-            catch (Exception ex)
-            {
+        //        if (responseMessage.IsSuccessStatusCode)
+        //        {
+        //            string data = responseMessage.Content.ReadAsStringAsync().Result;
+        //            dep = JsonConvert.DeserializeObject<DepartmentViewModel>(data);
+        //        }
+        //        return View(dep);
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }            
-        }
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }            
+        //}
 
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(string departmentName)
-        {
-            HttpResponseMessage response = _client
-                .DeleteAsync(_client.BaseAddress + "/departments/DeleteDepartment" + departmentName).Result;
+        //[HttpPost, ActionName("Delete")]
+        //public IActionResult DeleteConfirmed(string departmentName)
+        //{
+        //    HttpResponseMessage response = _client
+        //        .DeleteAsync(_client.BaseAddress + "/departments/DeleteDepartment" + departmentName).Result;
 
-            try
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["successMessage"] = "Department Deleated.";
-                    return RedirectToAction("GetAllDepartments");
-                }
-            }
-            catch (Exception ex)
-            {
+        //    try
+        //    {
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            TempData["successMessage"] = "Department Deleated.";
+        //            return RedirectToAction("GetAllDepartments");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                TempData["errorMessage"] = ex.Message;
-                return View();  
-            }
-            return View();
-        }
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();  
+        //    }
+        //    return View();
+        //}
     }
 }

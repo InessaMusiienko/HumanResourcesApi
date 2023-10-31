@@ -1,13 +1,23 @@
 ﻿using HumanResources.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 
 namespace HumanResources.Controllers
 {
+    public enum Types
+    {
+        [Display(Name = "Select type of absence")]
+        SelectType = 0,
+        BasicPaid = 1,
+        Unpaid = 2,
+        GeneralDisease = 3
+    }
+
     [Authorize]
     public class AbsenceController : Controller
     {
@@ -51,11 +61,19 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var types = from Types e in Enum.GetValues(typeof(Types))
+                        select new
+                        {
+                            Id = (int)e,
+                            Name = e.ToString()
+                        };
+            SelectList selectLists = new SelectList(types, "Id", "Name");
+            ViewBag.Types = selectLists;
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(AbsenceViewModel model)
+        public IActionResult Create(AbsencePostModel model)
         {
             var id = GetUserId();
 
@@ -65,7 +83,7 @@ namespace HumanResources.Controllers
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = _client.PostAsync(_client.BaseAddress 
-                    + "/absences/postabsence/" + id, content).Result;
+                    + $"/absences/postabsence/{id}", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using HumanResources.Controllers;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace HumanResources.Models
@@ -6,12 +7,13 @@ namespace HumanResources.Models
     public class AbsenceViewModel
     {
         [Key]
-        public int AbsenceId { get; set; }
+        public int Id { get; set; }
 
         public string Status { get; set; } = "Not approved";
 
         [DisplayName("Type")]
-        public int TypeOfAbsence { get; set; }
+        //public string TypeOfAbsence { get; set; } = null!;
+        public Types TypeOfAbsence { get; set; }
 
         public DateTime StartDate { get; set; }
 

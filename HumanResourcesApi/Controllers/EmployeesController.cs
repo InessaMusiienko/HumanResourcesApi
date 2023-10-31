@@ -69,6 +69,33 @@ namespace HumanResourcesApi.Controllers
             return employee;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<AllEmployeeViewModel>>> GetDepartmentEmployees(int id)
+        {
+            var department = await _context.Departments
+                .FirstOrDefaultAsync(d => d.DepartmentId == id);
+
+            if (department == null) { return BadRequest(); }
+
+            var employees = await _context.Employees.Select(e => new AllEmployeeViewModel
+            {
+                Id = e.EmployeeId,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Department = e.Department.DepartmentName,
+                JobTitle = e.JobTitle.JobName,
+                Email = e.Email,
+                ContactNumber = e.ContactNumber,
+                Adress = e.Adress
+            })
+            .ToListAsync();
+
+            var employeesByDepartment = employees.Where(e => e.Department == department.DepartmentName).ToList();
+
+            return employeesByDepartment;
+        }
+
+
         // PUT: api/Employees/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, AllEmployeeViewModel updatedEmployee)

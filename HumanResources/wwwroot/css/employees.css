@@ -1,0 +1,227 @@
+﻿body {
+    width: 100%;
+    overflow-x: hidden;
+    background-color: #f2f3f4;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.general-div {
+    text-align: center;
+    color: black;
+    font-size: 30px;
+    line-height: 30px;
+}
+
+#moviesSection {
+    color: black;
+    width: 100%;
+}
+
+.sub-div {
+    margin-bottom: 12px;
+    width: 23%;
+    /*float: left;*/
+    margin-left: 12px;
+    display: inline-block;
+}
+
+article {
+    overflow: hidden;
+    /*border-radius: 12px;*/
+}
+
+.movie__img2 {
+    width: 100%;
+    border-radius: 15px;
+    margin-bottom: 8px;
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.movie__tag--thriller,
+.movie__tag--fantasy,
+.movie__tag--animation,
+.movie__tag--comedy,
+.movie__tag--action {
+    display: inline-block;
+    width: 50%;
+    margin: 0;
+    border: none;
+    border-radius: 12px;
+    padding: 2px 5px;
+    background-color: yellow;
+    border: 2px solid #F1C40F;
+    margin-top: 0;
+    cursor: pointer;
+    font-size: 13px;
+    justify-items: left;
+    justify-self: left;
+}
+
+.movie__tag--fantasy {
+    background-color: yellow;
+    border: 2px solid #F1C40F;
+    margin-top: 0;
+}
+
+.movie__tag--thriller {
+    background-color: #85C1E9;
+    border: 2px solid #5DADE2;
+}
+
+.movie__tag--animation {
+    background-color: #58D68D;
+    border: 2px solid #28B463;
+}
+
+.movie__tag--comedy {
+    background-color: #FFBE32;
+    border: 2px solid #F3AB18;
+}
+
+.movie__tag--action {
+    background-color: #BC827C;
+    border: 2px solid #B7707A;
+}
+
+h5 {
+    display: inline;
+    text-transform: capitalize;
+    font-size: 15px;
+    text-align: left;
+    font-weight: bold;
+}
+
+p {
+    margin-bottom: 0;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #2d3748;
+    --max-lines: 3;
+    --line-height: 1.4;
+    max-height: calc(var(--max-lines)* 1em * var(--line-height));
+    line-height: var(--line-height);
+    overflow: hidden;
+    position: relative;
+}
+
+    p::before {
+        content: "";
+        position: absolute;
+        height: calc(2em * var(line-height));
+        width: 100%;
+        bottom: 0;
+        pointer-events: none;
+        background: linear-gradient(to bottom, transparent, white);
+    }
+
+.addToFavor--thriller,
+.addToFavor--fantasy,
+.addToFavor--animation,
+.addToFavor--comedy,
+.addToFavor--action {
+    display: inline;
+    width: 70%;
+    margin: 6px 15%;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid yellow;
+    background-color: white;
+    color: black;
+    padding: 2px 5px;
+    font-size: 15px;
+    transform: scale(1.2);
+}
+
+.addToFavor--thriller {
+    background-color: white;
+    border: 2px solid #5DADE2;
+}
+
+    .addToFavor--thriller:active {
+        background-color: #85C1E9;
+    }
+
+.addToFavor--fantasy {
+    background-color: white;
+    border: 2px solid #F1C40F;
+}
+
+    .addToFavor--fantasy:active {
+        background-color: yellow;
+    }
+
+.addToFavor--animation {
+    background-color: white;
+    border: 2px solid #28B463;
+}
+
+    .addToFavor--animation:active {
+        background-color: #58D68D;
+    }
+
+.addToFavor--comedy {
+    background-color: white;
+    border: 2px solid #F3AB18;
+}
+
+    .addToFavor--comedy:active {
+        background-color: #FFBE32;
+    }
+
+.addToFavor--action {
+    background-color: white;
+    border: 2px solid #B7707A;
+}
+
+    .addToFavor--action:active {
+        background-color: #BC827C;
+    }
+
+
+.h_container {
+    border-radius: 20px;
+    /*box-shadow: 0 2px 8px rgba(0,0,0,.1);*/
+    color: black;
+    display: inline-block;
+    width: 40%;
+    height: 35px;
+    text-align: center;
+    line-height: 45px;
+}
+
+#heart {
+    font-size: 25px;
+    color: black;
+}
+
+    #heart:hover {
+        color: red;
+    }
+
+sub-div #details {
+    display: inline-block;
+    width: 40%;
+    border: none;
+    margin: 6px 15%;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid purple;
+    background-color: white;
+    color: purple;
+    padding: 2px 5px;
+    font-size: 15px; /*
+    margin-top: 3px;
+    margin-bottom: 2px;*/
+}
+
+sub-div:hover #details {
+    background-color: #AA81EE;
+}
+
+sub-div #details:hover {
+    background-color: purple;
+    color: white;
+}

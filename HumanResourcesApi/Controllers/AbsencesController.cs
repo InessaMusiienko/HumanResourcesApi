@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
 using HumanResourcesApi.Models.ApiModels;
 using HumanResourcesApi.Models;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
+using HumanResources.Models;
 
 namespace HumanResourcesApi.Controllers
 {
+    public enum Types
+    {
+        [Display(Name = "Select type of absence")]
+        SelectType = 0,
+        BasicPaid = 1,
+        Unpaid = 2,
+        GeneralDisease = 3
+    }
+
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AbsencesController : ControllerBase
@@ -22,17 +28,6 @@ namespace HumanResourcesApi.Controllers
         public AbsencesController(HrappDbContext context)
         {
             _context = context;
-        }
-
-        private string GetUserId()
-        {
-            string id = string.Empty;
-
-            if (User != null)
-            {
-                id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            }
-            return id;
         }
 
         // GET: api/Absences
@@ -66,7 +61,7 @@ namespace HumanResourcesApi.Controllers
 
         // PUT: api/Absences/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAbsence(int id, AbsenceDTO absence)
+        public async Task<IActionResult> PutAbsence(AbsenceDTO absence, int id)
         {
             _context.Entry(absence).State = EntityState.Modified;
 
@@ -91,25 +86,25 @@ namespace HumanResourcesApi.Controllers
 
         // POST: api/Absences
         [HttpPost("{id}")]
-        public async Task<ActionResult<Absence>> PostAbsence(int id, AbsenceDTO absence)
+        public async Task<ActionResult<AbsencePostModel>> PostAbsence(string id, AbsencePostModel absence)
         {
-            if (new string[] { absence.StartDate.ToString(), 
-                absence.EndDate.ToString(), absence.TypeOfAbsence }.Any(x => string.IsNullOrEmpty(x)))
-            {
-                return BadRequest();
-            }
+            //if (new string[] { absence.StartDate.ToString(), 
+            //    absence.EndDate.ToString(), absence.TypeOfAbsence }.Any(x => string.IsNullOrEmpty(x)))
+            //{
+            //    return BadRequest();
+            //}
 
-            Absence newAbsence = new Absence()
-            {
-                EmployeeId = id,
-                StartDate = absence.StartDate,
-                Status = "Not approved",
-                EndDate = absence.EndDate,
-                Reason = absence.Reason,
-                TypeOfAbsence = (int)Enum.Parse<TypeOfAbsence>(absence.TypeOfAbsence)
-            };
+            //Absence newAbsence = new Absence()
+            //{
+            //    EmployeeId = int.Parse(id),
+            //    StartDate = absence.StartDate,
+            //    Status = "Not approved",
+            //    EndDate = absence.EndDate,
+            //    Reason = absence.Reason,
+            //    TypeOfAbsence = (int)Enum.Parse<TypeOfAbsence>(absence.TypeOfAbsence)
+            //};
 
-            _context.Absences.Add(newAbsence);
+            //_context.Absences.Add(newAbsence);
 
             try
             {

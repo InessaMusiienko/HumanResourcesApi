@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
 using HumanResourcesApi.Models.ApiModels;
+using HumanResources.Models;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -24,14 +25,19 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments(string? SearchString)
+        public async Task<ActionResult<IEnumerable<DepartmentViewModel>>> GetDepartments(string? SearchString)
         {
           if (_context.Departments == null)
           {
               return NotFound();
           }
 
-            var departments = await _context.Departments.Include(d=>d.Managers).ToListAsync();
+            var departments = await _context.Departments.Select(d=> new DepartmentViewModel
+            {
+                DepartmentId = d.DepartmentId,
+                DepartmentName = d.DepartmentName
+            }).ToListAsync();
+
             if (!String.IsNullOrEmpty(SearchString))
             {
                 departments = departments
@@ -76,13 +82,34 @@ namespace HumanResourcesApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Department>> PostDepartment(DepartmentDTO department)
         {
+            if(department == null)
+            {
+                return BadRequest();
+            }
+
+            var departAlreadyExist = await _context.Departments
+                .FirstOrDefaultAsync(d => d.DepartmentName == department.DepartmentName);
+
+            if(departAlreadyExist != null)
+            {
+                return BadRequest();
+            }
+
             Department newDepartment = new Department()
             {
                 DepartmentName = department.DepartmentName
             };
 
             _context.Departments.Add(newDepartment);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
 
             return Ok(newDepartment);
         }

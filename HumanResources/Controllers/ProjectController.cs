@@ -33,5 +33,36 @@ namespace HumanResources.Controllers
 
             return View(projectList);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(ProjectViewModel model)
+        {
+            try
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = _client
+                    .PostAsync(_client.BaseAddress + "/projects/postproject", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("GetAllProjects");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+            //return View();
+            return this.RedirectToAction("GetAllProjects");
+        }
     }
 }

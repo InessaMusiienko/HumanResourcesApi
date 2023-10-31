@@ -6,7 +6,7 @@ namespace HumanResources.Models
     public class ProjectViewModel
     {
         [Key]
-        public int ProjectId { get; set; }
+        public int Id { get; set; }
 
         [DisplayName("Project Name")]
         public string ProjectName { get; set; } = null!;

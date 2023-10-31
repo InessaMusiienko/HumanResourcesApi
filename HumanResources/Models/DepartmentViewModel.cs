@@ -6,7 +6,7 @@ namespace HumanResources.Models
     public class DepartmentViewModel
     {
         [Key]
-        public int Id { get; set; }
+        public int DepartmentId { get; set; }
         [Required]
         [DisplayName("Department Name")]
         public string DepartmentName { get; set; } = null!;

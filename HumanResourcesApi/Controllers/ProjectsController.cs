@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
-using HumanResourcesApi.Models.ApiModels;
+using HumanResources.Models;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -24,13 +24,20 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Projects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<ProjectViewModel>>> GetProjects()
         {
           if (_context.Projects == null)
           {
               return NotFound();
           }
-            return await _context.Projects.ToListAsync();
+            return await _context.Projects.Select(p=> new ProjectViewModel
+            {
+                Id = p.ProjectId,
+                ProjectName = p.ProjectName,
+                Duration = p.Duration,
+                StartedOn = p.StartedOn,
+                Status = p.Status
+            }).ToListAsync();
         }
 
         // GET: api/Projects/5
@@ -83,9 +90,15 @@ namespace HumanResourcesApi.Controllers
 
         // POST: api/Projects
         [HttpPost]
-        public async Task<ActionResult<Project>> PostProject(ProjectDTO project)
+        public async Task<ActionResult<Project>> PostProject(ProjectViewModel project)
         {
             if (new string[] { project.ProjectName, project.Duration.ToString(), project.Status }.Any(x => string.IsNullOrEmpty(x)))
+            {
+                return BadRequest();
+            }
+            var projectAlreadyExist = await _context.Projects
+                .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == project.ProjectName.ToLower());
+            if (projectAlreadyExist != null)
             {
                 return BadRequest();
             }
