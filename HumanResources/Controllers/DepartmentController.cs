@@ -37,16 +37,16 @@ namespace HumanResources.Controllers
         {
             try
             {
-                AllEmployeeViewModel employee = new AllEmployeeViewModel();
+                List<AllEmployeeViewModel> employees = new List<AllEmployeeViewModel>();
                 HttpResponseMessage response = _client
                     .GetAsync(_client.BaseAddress + $"/employees/getdepartmentemployees/{id}").Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    employees = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
                 }
-                return View(employee);
+                return View(employees);
             }
             catch (Exception)
             {

@@ -35,7 +35,7 @@ namespace HumanResourcesApi.Controllers
                 Id = p.ProjectId,
                 ProjectName = p.ProjectName,
                 Duration = p.Duration,
-                StartedOn = p.StartedOn,
+                StartedOn = p.StartedOn.ToString(),
                 Status = p.Status
             }).ToListAsync();
         }
@@ -60,14 +60,20 @@ namespace HumanResourcesApi.Controllers
 
         // PUT: api/Projects/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProject(int id, Project project)
+        public async Task<IActionResult> PutProject(int id, ProjectViewModel updatedproject)
         {
-            if (id != project.ProjectId)
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+            if (project == null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(project).State = EntityState.Modified;
+            //check started on 
+
+            project.ProjectName = updatedproject.ProjectName;
+            project.StartedOn = DateTime.Parse(updatedproject.StartedOn);
+            project.Status = updatedproject.Status;
+            project.Duration = updatedproject.Duration;
 
             try
             {
@@ -103,12 +109,14 @@ namespace HumanResourcesApi.Controllers
                 return BadRequest();
             }
 
+            var start = DateTime.Parse(project.StartedOn);
+
             var projectToAdd = new Project()
             {
                 ProjectName = project.ProjectName,
                 Duration = project.Duration,
                 Status = project.Status,
-                StartedOn = DateTime.UtcNow,
+                StartedOn = start,
                 EmployeesProjects = new List<EmployeeProject>()
             };
 
@@ -128,7 +136,7 @@ namespace HumanResourcesApi.Controllers
 
         // DELETE: api/Projects/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProject(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (_context.Projects == null)
             {

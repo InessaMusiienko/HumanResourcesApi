@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace HumanResources.Controllers
 {
@@ -63,6 +64,97 @@ namespace HumanResources.Controllers
             }
             //return View();
             return this.RedirectToAction("GetAllProjects");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                ProjectViewModel project = new ProjectViewModel();
+                HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
+                }
+                return View(project);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                HttpResponseMessage responsw = _client
+                        .DeleteAsync(_client.BaseAddress + "/projects/delete/" + id).Result;
+
+                if (responsw.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "Project deleted.";
+                    return RedirectToAction("GetAllProjects");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            try
+            {
+                ProjectViewModel project = new ProjectViewModel();
+                HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
+                }
+                return View(project);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int id, ProjectViewModel model)
+        {
+            try
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = _client
+                    .PutAsync(_client.BaseAddress + $"/projects/putproject/{id}", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "Project info updated";
+                    return RedirectToAction("GetAllProjects");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+            return View();
         }
     }
 }

@@ -5,6 +5,8 @@ using HumanResourcesApi.Models.Entities;
 using HumanResourcesApi.Models.ApiModels;
 using System.Globalization;
 using HumanResources.Models;
+using NuGet.Protocol.Core.Types;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -64,7 +66,6 @@ namespace HumanResourcesApi.Controllers
             })
               .ToListAsync();
 
-            //var employee = await _context.Employees.FirstOrDefaultAsync(e => e.ContactNumber == contactNumber);
             var employee = employees.FirstOrDefault(e => e.Id == id);
             return employee;
         }

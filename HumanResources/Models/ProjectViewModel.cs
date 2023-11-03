@@ -15,7 +15,7 @@ namespace HumanResources.Models
         public int Duration { get; set; }
 
         [DisplayName("Started")]
-        public DateTime? StartedOn { get; set; }
+        public string StartedOn { get; set; }
 
         public string Status { get; set; } = null!;
     }

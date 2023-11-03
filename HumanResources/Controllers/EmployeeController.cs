@@ -7,7 +7,6 @@ using System.Text;
 
 namespace HumanResources.Controllers
 {
-    [Authorize]
     public class EmployeeController : Controller
     {
         Uri baseAddress = new Uri("https://localhost:7175/api");

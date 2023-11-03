@@ -1,5 +1,6 @@
 ﻿using HumanResources.Controllers;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace HumanResources.Models
 {
@@ -9,8 +10,10 @@ namespace HumanResources.Models
 
         public int TypeOfAbsence { get; set; }
 
+        [Required]
         public string StartDate { get; set; }
 
+        [Required]
         public string EndDate { get; set; }
 
         public string? Reason { get; set; }
