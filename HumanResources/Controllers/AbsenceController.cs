@@ -44,10 +44,11 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult GetAllAbsences()
         {
-            var id = GetUserId();
+            var user = User.FindFirstValue(ClaimTypes.Email);
 
             List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
-            HttpResponseMessage responce = _client.GetAsync(_client.BaseAddress + "/absences/getabsence" + id).Result;
+            HttpResponseMessage responce = _client
+                .GetAsync(_client.BaseAddress + $"/absences/getabsence/{user}").Result;
 
             if (responce.IsSuccessStatusCode)
             {

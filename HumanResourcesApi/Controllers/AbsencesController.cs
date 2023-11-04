@@ -44,20 +44,31 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Absences/5
         [HttpGet("{user}")]
-        public async Task<ActionResult<IEnumerable<Absence>>> GetAbsence(string user)
+        public async Task<ActionResult<IEnumerable<AbsencePostModel>>> GetAbsence(string user)
         {
-          if (_context.Absences == null)
-          {
-              return NotFound();
-          }
-            var absence = await _context.Absences.Where(a=>a.EmployeeId == int.Parse(user)).ToListAsync();
-
-            if (absence == null)
+            if (_context.Absences == null)
             {
                 return NotFound();
             }
 
-            return absence;
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == user);
+            var absences = await _context.Absences.Where(a=>a.EmployeeId == employee.EmployeeId)
+                .Select(a => new AbsencePostModel
+                {
+
+                    Status = a.Status,
+                    StartDate = a.StartDate.ToString(),
+                    EndDate = a.EndDate.ToString(),
+                    TypeOfAbsence = a.TypeOfAbsence,
+                    Reason = a.Reason
+                }).ToListAsync();
+
+            if (absences == null)
+            {
+                return NotFound();
+            }
+
+            return absences;
         }
 
         // PUT: api/Absences/5
