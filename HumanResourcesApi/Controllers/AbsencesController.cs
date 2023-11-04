@@ -7,6 +7,7 @@ using HumanResourcesApi.Models;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using HumanResources.Models;
+using System.Globalization;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -85,26 +86,22 @@ namespace HumanResourcesApi.Controllers
         }
 
         // POST: api/Absences
-        [HttpPost("{id}")]
-        public async Task<ActionResult<AbsencePostModel>> PostAbsence(string id, AbsencePostModel absence)
+        [HttpPost("{user}")]
+        public async Task<ActionResult<AbsencePostModel>> PostAbsence(string user, AbsencePostModel absence)
         {
-            //if (new string[] { absence.StartDate.ToString(), 
-            //    absence.EndDate.ToString(), absence.TypeOfAbsence }.Any(x => string.IsNullOrEmpty(x)))
-            //{
-            //    return BadRequest();
-            //}
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == user);
 
-            //Absence newAbsence = new Absence()
-            //{
-            //    EmployeeId = int.Parse(id),
-            //    StartDate = absence.StartDate,
-            //    Status = "Not approved",
-            //    EndDate = absence.EndDate,
-            //    Reason = absence.Reason,
-            //    TypeOfAbsence = (int)Enum.Parse<TypeOfAbsence>(absence.TypeOfAbsence)
-            //};
+            Absence newAbsence = new Absence()
+            {
+                EmployeeId = employee.EmployeeId,
+                StartDate = DateTime.ParseExact(absence.StartDate,"yyyy-MM-dd",CultureInfo.InvariantCulture),
+                Status = "Waiting",
+                EndDate = DateTime.ParseExact(absence.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                Reason = absence.Reason,
+                TypeOfAbsence = absence.TypeOfAbsence,
+            };
 
-            //_context.Absences.Add(newAbsence);
+            _context.Absences.Add(newAbsence);
 
             try
             {

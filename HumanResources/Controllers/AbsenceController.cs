@@ -75,15 +75,15 @@ namespace HumanResources.Controllers
         [HttpPost]
         public IActionResult Create(AbsencePostModel model)
         {
-            var id = GetUserId();
+            var user = User.FindFirstValue(ClaimTypes.Email);
 
             try
             {
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress 
-                    + $"/absences/postabsence/{id}", content).Result;
+                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress
+                    + $"/absences/postabsence/{user}", content).Result;
 
                 if (response.IsSuccessStatusCode)
                 {

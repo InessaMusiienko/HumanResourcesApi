@@ -6,7 +6,7 @@ namespace HumanResources.Models
 {
     public class AbsencePostModel
     {
-        public string? Status { get; set; } = "Not approved";
+        public string? Status { get; set; } = "Waiting";
 
         public int TypeOfAbsence { get; set; }
 

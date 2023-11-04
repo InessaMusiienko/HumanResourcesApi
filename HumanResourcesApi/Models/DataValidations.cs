@@ -26,7 +26,7 @@ namespace HumanResourcesApi.Models
         public const int DepartmentMaxLength = 15;
 
         //Absence
-        public const int StatusMaxLength = 10;
+        public const int StatusMaxLength = 20;
         public const int TypeOfAbsenceMaxLength = 15;
         public const int ReasonMaxLength = 100;
 
