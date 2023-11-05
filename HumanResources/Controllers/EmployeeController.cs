@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Data;
+using System.Security.Claims;
 using System.Text;
 
 namespace HumanResources.Controllers
@@ -21,19 +22,42 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult GetAllEmployees()
         {
-             
-            List<AllEmployeeViewModel> employeeList = new List<AllEmployeeViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/employees/getemployees").Result;
-
-            if (response.IsSuccessStatusCode)
+            if (User.Identity.IsAuthenticated)
             {
-                string data = response.Content.ReadAsStringAsync().Result;
-                employeeList = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
+                if (User.IsInRole("Member"))
+                {
+                    var user = User.FindFirstValue(ClaimTypes.Email);
+                    AllEmployeeViewModel employee = new AllEmployeeViewModel();
+                    HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + $"/employees/getemployeeinfo/{user}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    }
+                    return View("GetEmployeeInfo", employee);
+                }
+                else
+                {
+                    List<AllEmployeeViewModel> employeeList = new List<AllEmployeeViewModel>();
+                    HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/employees/getemployees").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        employeeList = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
+                    }
+
+                    return View(employeeList);
+                }
             }
-
-            return View(employeeList);
+            else
+            {
+                return BadRequest();
+            }
         }
-
+    
         [HttpGet]
         public IActionResult Create()
         {

@@ -71,6 +71,29 @@ namespace HumanResourcesApi.Controllers
             return absences;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AbsenceViewModel>> GetAbsence(int id)
+        {
+            if (_context.Absences == null)
+            {
+                return NotFound();
+            }
+
+            var absences = await _context.Absences
+                .Select(a => new AbsenceViewModel
+                {
+                    Id = a.AbsenceId,
+                    Status = a.Status,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    Reason = a.Reason
+                }).ToListAsync();
+
+            var absence = absences.FirstOrDefault(a => a.Id == id);
+
+            return absence;
+        }
+
         // PUT: api/Absences/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAbsence(AbsenceDTO absence, int id)

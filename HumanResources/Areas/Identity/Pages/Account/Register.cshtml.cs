@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -104,6 +105,8 @@ namespace HumanResources.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    string rolname = "Member";
+                    await _userManager.AddToRoleAsync(user, rolname);
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
                     return LocalRedirect(returnUrl);

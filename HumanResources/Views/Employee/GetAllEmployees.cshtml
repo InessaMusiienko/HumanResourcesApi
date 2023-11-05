@@ -6,9 +6,17 @@
 
 <h1>All Employees</h1>
 
+@if (User.Identity.IsAuthenticated)
+{
+    if (User.IsInRole("Hr"))
+    {
+                
+    }
+}
 <p>
     <a asp-action="Create">Create New</a>
-</p>
+</p> 
+
 <table class="table">
     <thead>
         <tr>
@@ -61,7 +69,7 @@
                 @Html.DisplayFor(modelItem => item.Adress)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {item.Id})|
+                @Html.ActionLink("Edit", "Edit", new {item.Id})
                 @Html.ActionLink("Delete", "Delete", new {item.Id})
             </td>
         </tr>

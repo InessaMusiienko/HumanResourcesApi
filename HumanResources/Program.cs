@@ -95,7 +95,7 @@ namespace HumanResources
                     await userManager.CreateAsync(user, password);
 
                     await userManager.AddToRoleAsync(user, "Hr");
-                }                
+                }
             }
 
             app.Run();

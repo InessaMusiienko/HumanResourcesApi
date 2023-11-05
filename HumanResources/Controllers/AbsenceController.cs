@@ -1,9 +1,15 @@
-﻿using HumanResources.Models;
+﻿using Humanizer;
+using HumanResources.Models;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 
@@ -44,19 +50,45 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult GetAllAbsences()
         {
-            var user = User.FindFirstValue(ClaimTypes.Email);
+            var userId = GetUserId();
 
-            List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
-            HttpResponseMessage responce = _client
-                .GetAsync(_client.BaseAddress + $"/absences/getabsence/{user}").Result;
-
-            if (responce.IsSuccessStatusCode)
+            if (User.Identity.IsAuthenticated)
             {
-                string data = responce.Content.ReadAsStringAsync().Result;
-                absenceList = JsonConvert.DeserializeObject<List<AbsenceViewModel>>(data);
-            }
+                if (User.IsInRole("Member"))
+                {
+                    var user = User.FindFirstValue(ClaimTypes.Email);
 
-            return View(absenceList);
+                    List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
+                    HttpResponseMessage responce = _client
+                        .GetAsync(_client.BaseAddress + $"/absences/getabsence/{user}").Result;
+
+                    if (responce.IsSuccessStatusCode)
+                    {
+                        string data = responce.Content.ReadAsStringAsync().Result;
+                        absenceList = JsonConvert.DeserializeObject<List<AbsenceViewModel>>(data);
+                    }
+
+                    return View(absenceList);
+                }
+                else
+                {
+                    List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
+                    HttpResponseMessage responce = _client
+                        .GetAsync(_client.BaseAddress + "/absences/getabsences").Result;
+
+                    if (responce.IsSuccessStatusCode)
+                    {
+                        string data = responce.Content.ReadAsStringAsync().Result;
+                        absenceList = JsonConvert.DeserializeObject<List<AbsenceViewModel>>(data);
+                    }
+
+                    return View(absenceList);
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
@@ -100,5 +132,50 @@ namespace HumanResources.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                AbsenceViewModel absence = new AbsenceViewModel();
+                HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + "/absences/getemployee/" + id).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    absence = JsonConvert.DeserializeObject<AbsenceViewModel>(data);
+                }
+                return View(absence);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                HttpResponseMessage responsw = _client
+                        .DeleteAsync(_client.BaseAddress + "/employees/delete/" + id).Result;
+
+                if (responsw.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "Employee deleted.";
+                    return RedirectToAction("GetAllEmployees");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+            return View();
+        }
+
     }
 }

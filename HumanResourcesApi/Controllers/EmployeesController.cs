@@ -70,6 +70,31 @@ namespace HumanResourcesApi.Controllers
             return employee;
         }
 
+        [HttpGet("{user}")]
+        public async Task<ActionResult<AllEmployeeViewModel>> GetEmployeeInfo(string user)
+        {
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
+            
+            var employees = await _context.Employees.Select(e => new AllEmployeeViewModel
+            {
+                Id = e.EmployeeId,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Department = e.Department.DepartmentName,
+                JobTitle = e.JobTitle.JobName,
+                Email = e.Email,
+                ContactNumber = e.ContactNumber,
+                Adress = e.Adress
+            })
+              .ToListAsync();
+
+            var employee = employees.FirstOrDefault(e => e.Email == user);
+            return employee;
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<AllEmployeeViewModel>>> GetDepartmentEmployees(int id)
         {
