@@ -121,7 +121,6 @@ namespace HumanResourcesApi.Controllers
             return employeesByDepartment;
         }
 
-
         // PUT: api/Employees/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, AllEmployeeViewModel updatedEmployee)

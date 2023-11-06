@@ -1,15 +1,11 @@
-﻿using Humanizer;
-using HumanResources.Models;
+﻿using HumanResources.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 
@@ -58,28 +54,28 @@ namespace HumanResources.Controllers
                 {
                     var user = User.FindFirstValue(ClaimTypes.Email);
 
-                    List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
+                    List<AbsenceAllView> absenceList = new List<AbsenceAllView>();
                     HttpResponseMessage responce = _client
                         .GetAsync(_client.BaseAddress + $"/absences/getabsence/{user}").Result;
 
                     if (responce.IsSuccessStatusCode)
                     {
                         string data = responce.Content.ReadAsStringAsync().Result;
-                        absenceList = JsonConvert.DeserializeObject<List<AbsenceViewModel>>(data);
+                        absenceList = JsonConvert.DeserializeObject<List<AbsenceAllView>>(data);
                     }
 
                     return View(absenceList);
                 }
                 else
                 {
-                    List<AbsenceViewModel> absenceList = new List<AbsenceViewModel>();
+                    List<AbsenceAllView> absenceList = new List<AbsenceAllView>();
                     HttpResponseMessage responce = _client
                         .GetAsync(_client.BaseAddress + "/absences/getabsences").Result;
 
                     if (responce.IsSuccessStatusCode)
                     {
                         string data = responce.Content.ReadAsStringAsync().Result;
-                        absenceList = JsonConvert.DeserializeObject<List<AbsenceViewModel>>(data);
+                        absenceList = JsonConvert.DeserializeObject<List<AbsenceAllView>>(data);
                     }
 
                     return View(absenceList);
@@ -94,87 +90,166 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var types = from Types e in Enum.GetValues(typeof(Types))
-                        select new
-                        {
-                            Id = (int)e,
-                            Name = e.ToString()
-                        };
-            SelectList selectLists = new SelectList(types, "Id", "Name");
-            ViewBag.Types = selectLists;
-            return View();
+            if (User.IsInRole("Member"))
+            {
+                var types = from Types e in Enum.GetValues(typeof(Types))
+                            select new
+                            {
+                                Id = (int)e,
+                                Name = e.ToString()
+                            };
+                SelectList selectLists = new SelectList(types, "Id", "Name");
+                ViewBag.Types = selectLists;
+                return View();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [HttpPost]
         public IActionResult Create(AbsencePostModel model)
         {
-            var user = User.FindFirstValue(ClaimTypes.Email);
-
-            try
+            if (User.IsInRole("Member"))
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress
-                    + $"/absences/postabsence/{user}", content).Result;
+                var user = User.FindFirstValue(ClaimTypes.Email);
 
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Absence Added. Wait for approval!";
-                    return RedirectToAction("GetAllAbsences");
+                    string data = JsonConvert.SerializeObject(model);
+                    StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = _client.PostAsync(_client.BaseAddress
+                        + $"/absences/postabsence/{user}", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Absence Added. Wait for approval!";
+                        return RedirectToAction("GetAllAbsences");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    throw;
+                }
+
+                return View();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            if (User.IsInRole("Hr"))
+            {
+                try
+                {
+                    AbsenceAllView absence = new AbsenceAllView();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/absences/getabsencebyid/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        absence = JsonConvert.DeserializeObject<AbsenceAllView>(data);
+                    }
+                    return View(absence);
+                }
+                catch (Exception)
+                {
+                    return View();
                 }
             }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                throw;
-            }
+            else { return BadRequest(); }
+        }
 
-            return View();
+        [HttpPost, ActionName("Edit")]
+        public IActionResult EditConfirmed(int id)
+        {
+            if (User.IsInRole("Hr"))
+            {
+                try
+                {
+                    HttpResponseMessage response = _client.DeleteAsync
+                        (_client.BaseAddress + $"/absences/approve/{id}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("GetAllAbsence");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
+                return View();
+            }
+            else { return BadRequest(); }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                AbsenceViewModel absence = new AbsenceViewModel();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + "/absences/getemployee/" + id).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    absence = JsonConvert.DeserializeObject<AbsenceViewModel>(data);
+                    AbsenceAllView absence = new AbsenceAllView();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/absences/getabsencebyid/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        absence = JsonConvert.DeserializeObject<AbsenceAllView>(data);
+                    }
+                    return View(absence);
                 }
-                return View(absence);
+                catch (Exception)
+                {
+                    return View();
+                }
             }
-            catch (Exception)
+            else
             {
-                return View();
+                return BadRequest();
             }
         }
 
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                HttpResponseMessage responsw = _client
-                        .DeleteAsync(_client.BaseAddress + "/employees/delete/" + id).Result;
-
-                if (responsw.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Employee deleted.";
-                    return RedirectToAction("GetAllEmployees");
+                    HttpResponseMessage responsw = _client
+                            .DeleteAsync(_client.BaseAddress + "/absences/delete/" + id).Result;
+
+                    if (responsw.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("GetAllAbsences");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            return View();
+            else
+            {
+                return BadRequest();
+            }
         }
 
     }

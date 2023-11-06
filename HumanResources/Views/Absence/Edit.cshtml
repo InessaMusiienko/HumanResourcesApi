@@ -1,0 +1,101 @@
+﻿@model HumanResources.Models.AbsenceAllView
+
+@{
+    ViewData["Title"] = "GetAbsence";
+}
+@*
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TypeOfAbsence)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TypeOfAbsence)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Reason)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Reason)
+        </dd>
+    </dl>
+    <div class="form-group">
+        <a asp-controller="Absence" asp-action="Edit" asp-route-id=@Model.Id method="post">Approve</a>
+    </div>
+</div>
+
+<div>
+    <a asp-action="GetAllAbsences">Back to List</a>
+</div>
+*@
+<div>
+    <hr />
+    <form asp-action="Edit">
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.FirstName</h5>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.LastName</h5>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TypeOfAbsence)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.TypeOfAbsence</h5>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.StartDate</h5>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.EndDate</h5>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Reason)
+        </dt>
+        <dd class = "col-sm-10">
+            <h5>@Model.Reason</h5>
+        </dd>
+    </dl>
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Approve" class="btn btn-danger" /> |
+        <a asp-action="GetAllAbsences">Back to List</a>
+    </form>
+</div>

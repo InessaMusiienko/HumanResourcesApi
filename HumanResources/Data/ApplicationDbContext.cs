@@ -14,5 +14,6 @@ namespace HumanResources.Data
         public DbSet<HumanResources.Models.ProjectViewModel>? ProjectViewModel { get; set; }
         public DbSet<HumanResources.Models.AllEmployeeViewModel>? AllEmployeeViewModel { get; set; }
         public DbSet<HumanResources.Models.AbsenceViewModel>? AbsenceViewModel { get; set; }
+        public DbSet<HumanResources.Models.AbsenceAllView>? AbsenceAllView { get; set; }
     }
 }

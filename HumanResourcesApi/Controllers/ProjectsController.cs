@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
 using HumanResources.Models;
+using System.Globalization;
 
 namespace HumanResourcesApi.Controllers
 {
@@ -109,7 +110,7 @@ namespace HumanResourcesApi.Controllers
                 return BadRequest();
             }
 
-            var start = DateTime.Parse(project.StartedOn);
+            var start = DateTime.ParseExact(project.StartedOn, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             var projectToAdd = new Project()
             {

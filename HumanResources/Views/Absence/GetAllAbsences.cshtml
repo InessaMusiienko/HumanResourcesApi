@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HumanResources.Models.AbsenceViewModel>
+﻿@model IEnumerable<HumanResources.Models.AbsenceAllView>
 
 @{
     ViewData["Title"] = "GetAllAbsences";
@@ -6,12 +6,24 @@
 
 <h1>All Absences</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.Identity.IsAuthenticated)
+{
+    if (User.IsInRole("Member"))
+    {
+        <p>
+            <a asp-action="Create">Create New</a>
+        </p>        
+    }
+}
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
@@ -34,6 +46,12 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
@@ -49,8 +67,15 @@
                 @Html.DisplayFor(modelItem => item.Reason)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    @if(item.Status == "Waiting")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Approve</a>  
+                        <a asp-action="Delete" asp-route-id="@item.Id">Cancel</a>
+                    }
+                    else
+                    {
+                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>     
+                    }                   
             </td>
         </tr>
 }

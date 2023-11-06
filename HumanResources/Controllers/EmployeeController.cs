@@ -61,124 +61,146 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            if (User.IsInRole("Hr"))
+            {
+                return View();
+            }
+            else { return BadRequest(); }
         }
 
         [HttpPost]
         public IActionResult CreateEmployee(AllEmployeeViewModel model)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = _client
-                    .PostAsync(_client.BaseAddress + "/employees/postemployee", content).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Employee Created.";
-                    return RedirectToAction("GetAllEmployees");
+                    string data = JsonConvert.SerializeObject(model);
+                    StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = _client
+                        .PostAsync(_client.BaseAddress + "/employees/postemployee", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Employee Created.";
+                        return RedirectToAction("GetAllEmployees");
+                    }
                 }
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
+                return this.RedirectToAction("GetAllEmployees");
             }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }
-            //return View();
-            return this.RedirectToAction("GetAllEmployees");
+            else { return BadRequest(); }
         }
 
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                AllEmployeeViewModel employee = new AllEmployeeViewModel();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + "/employees/getemployee/" + id).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    AllEmployeeViewModel employee = new AllEmployeeViewModel();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/employees/getemployee/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    }
+                    return View(employee);
                 }
-                return View(employee);
+                catch (Exception)
+                {
+                    return View();
+                }
             }
-            catch (Exception)
-            {
-                return View();                
-            }
-            
+            else { return BadRequest(); }
         }
 
         [HttpPost]
         public IActionResult Edit(int id, AllEmployeeViewModel model)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = _client
-                    .PutAsync(_client.BaseAddress + $"/employees/putemployee/{id}", content).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Employee info updated";
-                    return RedirectToAction("GetAllEmployees");
+                    string data = JsonConvert.SerializeObject(model);
+                    StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = _client
+                        .PutAsync(_client.BaseAddress + $"/employees/putemployee/{id}", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Employee info updated";
+                        return RedirectToAction("GetAllEmployees");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            return View();
+            else { return BadRequest(); }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                AllEmployeeViewModel employee = new AllEmployeeViewModel();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + "/employees/getemployee/" + id).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    AllEmployeeViewModel employee = new AllEmployeeViewModel();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/employees/getemployee/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                    }
+                    return View(employee);
                 }
-                return View(employee);
+                catch (Exception)
+                {
+                    return View();
+                }
             }
-            catch (Exception)
-            {
-                return View();
-            }
+            return BadRequest();
         }
 
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                HttpResponseMessage responsw = _client
-                        .DeleteAsync(_client.BaseAddress + "/employees/delete/" + id).Result;
-
-                if (responsw.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Employee deleted.";
-                    return RedirectToAction("GetAllEmployees");
+                    HttpResponseMessage responsw = _client
+                            .DeleteAsync(_client.BaseAddress + "/employees/delete/" + id).Result;
+
+                    if (responsw.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Employee deleted.";
+                        return RedirectToAction("GetAllEmployees");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            return View();
+            else { return BadRequest(); }
         }
 
     }

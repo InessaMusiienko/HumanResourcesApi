@@ -38,123 +38,145 @@ namespace HumanResources.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            if (User.IsInRole("Hr"))
+            {
+                return View();
+            }
+            else { return BadRequest(); }
         }
 
         [HttpPost]
         public IActionResult Create(ProjectViewModel model)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = _client
-                    .PostAsync(_client.BaseAddress + "/projects/postproject", content).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    return RedirectToAction("GetAllProjects");
+                    string data = JsonConvert.SerializeObject(model);
+                    StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = _client
+                        .PostAsync(_client.BaseAddress + "/projects/postproject", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("GetAllProjects");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            //return View();
-            return this.RedirectToAction("GetAllProjects");
+            else { return BadRequest(); }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                ProjectViewModel project = new ProjectViewModel();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
+                    ProjectViewModel project = new ProjectViewModel();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
+                    }
+                    return View(project);
                 }
-                return View(project);
+                catch (Exception)
+                {
+                    return View();
+                }
             }
-            catch (Exception)
-            {
-                return View();
-            }
+            else { return BadRequest(); }
         }
 
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                HttpResponseMessage responsw = _client
-                        .DeleteAsync(_client.BaseAddress + "/projects/delete/" + id).Result;
-
-                if (responsw.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Project deleted.";
-                    return RedirectToAction("GetAllProjects");
+                    HttpResponseMessage responsw = _client
+                            .DeleteAsync(_client.BaseAddress + "/projects/delete/" + id).Result;
+
+                    if (responsw.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Project deleted.";
+                        return RedirectToAction("GetAllProjects");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            return View();
+            else { return BadRequest(); }
         }
 
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                ProjectViewModel project = new ProjectViewModel();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
-                }
-                return View(project);
-            }
-            catch (Exception)
-            {
-                return View();
-            }
+                    ProjectViewModel project = new ProjectViewModel();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
 
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
+                    }
+                    return View(project);
+                }
+                catch (Exception)
+                {
+                    return View();
+                }
+            }
+            return BadRequest();
         }
 
         [HttpPost]
         public IActionResult Edit(int id, ProjectViewModel model)
         {
-            try
+            if (User.IsInRole("Hr"))
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = _client
-                    .PutAsync(_client.BaseAddress + $"/projects/putproject/{id}", content).Result;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    TempData["successMessage"] = "Project info updated";
-                    return RedirectToAction("GetAllProjects");
+                    string data = JsonConvert.SerializeObject(model);
+                    StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = _client
+                        .PutAsync(_client.BaseAddress + $"/projects/putproject/{id}", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Project info updated";
+                        return RedirectToAction("GetAllProjects");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
                 return View();
             }
-            return View();
+            return BadRequest();
         }
     }
 }

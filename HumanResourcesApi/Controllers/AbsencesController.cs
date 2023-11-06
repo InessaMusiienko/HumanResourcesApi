@@ -33,13 +33,26 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Absences
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Absence>>> GetAbsences()
+        public async Task<ActionResult<IEnumerable<AbsenceAllView>>> GetAbsences()
         {
           if (_context.Absences == null)
           {
               return NotFound();
           }
-            return await _context.Absences.ToListAsync();
+            var absences =  await _context.Absences.Select(x => new AbsenceAllView
+            {
+                Id = x.AbsenceId,
+                FirstName = x.Employee.FirstName,
+                LastName = x.Employee.LastName,
+                EmployeeId = x.Employee.EmployeeId,
+                Status = x.Status,
+                Reason = x.Reason,
+                StartDate = x.StartDate.ToString(),
+                EndDate = x.EndDate.ToString(),
+                TypeOfAbsence = ((Types) x.TypeOfAbsence).ToString()
+            }).ToListAsync();
+
+            return absences;
         }
 
         // GET: api/Absences/5
@@ -72,7 +85,7 @@ namespace HumanResourcesApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AbsenceViewModel>> GetAbsence(int id)
+        public async Task<ActionResult<AbsenceAllView>> GetAbsenceById(int id)
         {
             if (_context.Absences == null)
             {
@@ -80,13 +93,17 @@ namespace HumanResourcesApi.Controllers
             }
 
             var absences = await _context.Absences
-                .Select(a => new AbsenceViewModel
+                .Select(x => new AbsenceAllView
                 {
-                    Id = a.AbsenceId,
-                    Status = a.Status,
-                    StartDate = a.StartDate,
-                    EndDate = a.EndDate,
-                    Reason = a.Reason
+                    Id = x.AbsenceId,
+                    FirstName = x.Employee.FirstName,
+                    LastName = x.Employee.LastName,
+                    EmployeeId = x.Employee.EmployeeId,
+                    Status = x.Status,
+                    Reason = x.Reason,
+                    StartDate = x.StartDate.ToString(),
+                    EndDate = x.EndDate.ToString(),
+                    TypeOfAbsence = ((Types)x.TypeOfAbsence).ToString()
                 }).ToListAsync();
 
             var absence = absences.FirstOrDefault(a => a.Id == id);
@@ -95,10 +112,17 @@ namespace HumanResourcesApi.Controllers
         }
 
         // PUT: api/Absences/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAbsence(AbsenceDTO absence, int id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Approve(int id)
         {
-            _context.Entry(absence).State = EntityState.Modified;
+            var absence = await _context.Absences.FirstOrDefaultAsync(a => a.AbsenceId == id);
+
+            if (absence == null)
+            {
+                return BadRequest();
+            }
+
+            absence.Status = "Approved";
 
             try
             {
@@ -151,7 +175,7 @@ namespace HumanResourcesApi.Controllers
 
         // DELETE: api/Absences/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAbsence(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (_context.Absences == null)
             {

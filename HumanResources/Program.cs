@@ -86,16 +86,20 @@ namespace HumanResources
                 string email = "hr@hr.com";
                 string password = "hrProfile1";
 
-                if(await userManager.FindByEmailAsync(email)==null)
-                {
-                    var user = new IdentityUser();
-                    user.UserName = "hrAccount";
-                    user.Email = email;
+                var user = await userManager.FindByEmailAsync(email);
+                await userManager.AddToRoleAsync(user, "Hr");
 
-                    await userManager.CreateAsync(user, password);
 
-                    await userManager.AddToRoleAsync(user, "Hr");
-                }
+                //if(await userManager.FindByEmailAsync(email)==null)
+                //{
+                //    var user = new IdentityUser();
+                //    user.UserName = "hrAccount";
+                //    user.Email = email;
+
+                //    await userManager.CreateAsync(user, password);
+
+                //    await userManager.AddToRoleAsync(user, "Hr");
+                //}
             }
 
             app.Run();
