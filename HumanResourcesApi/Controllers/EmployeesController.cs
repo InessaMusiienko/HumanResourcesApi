@@ -28,7 +28,7 @@ namespace HumanResourcesApi.Controllers
                 return NotFound();
             }
 
-            var employees = await _context.Employees.Select(e=> new AllEmployeeViewModel
+            var employees = await _context.Employees.Select(e => new AllEmployeeViewModel
             {
                 Id = e.EmployeeId,
                 FirstName = e.FirstName,
@@ -38,7 +38,7 @@ namespace HumanResourcesApi.Controllers
                 Email = e.Email,
                 ContactNumber = e.ContactNumber,
                 Adress = e.Adress
-            })              
+            })
             .ToListAsync();
 
             return employees;
@@ -48,10 +48,10 @@ namespace HumanResourcesApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AllEmployeeViewModel>> GetEmployee(int id)
         {
-          if (_context.Employees == null)
-          {
-              return NotFound();
-          }
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
 
             var employees = await _context.Employees.Select(e => new AllEmployeeViewModel
             {
@@ -68,6 +68,30 @@ namespace HumanResourcesApi.Controllers
 
             var employee = employees.FirstOrDefault(e => e.Id == id);
             return employee;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<AllEmployeeViewModel>>> GetEmployeesByProject(string id)
+        {
+            if (_context.Employees == null)
+            {
+                return NotFound();
+            }
+
+            var x = await _context.Employees.Where(x => !x.EmployeesProjects.Any(x => x.ProjectId == int.Parse(id)))
+                .Select(e=> new AllEmployeeViewModel
+                {
+                    Id = e.EmployeeId,
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Department = e.Department.DepartmentName,
+                    JobTitle = e.JobTitle.JobName,
+                    Email = e.Email,
+                    ContactNumber = e.ContactNumber,
+                    Adress = e.Adress
+                }).ToListAsync();
+
+            return x;
         }
 
         [HttpGet("{user}")]
@@ -191,8 +215,7 @@ namespace HumanResourcesApi.Controllers
                     return BadRequest();
                 }
             }
-
-            //var isHireDateValid = IsValidDate(employee.HireDate.ToString());            
+         
 
             Employee newEmployee = new Employee()
             {
@@ -203,7 +226,7 @@ namespace HumanResourcesApi.Controllers
                 Adress = employee.Adress,
                 HireDate = DateTime.Now,
                 Department = depart,
-                JobTitle = jobtitle
+                JobTitle = jobtitle,
             };
 
             _context.Employees.Add(newEmployee);
@@ -218,6 +241,27 @@ namespace HumanResourcesApi.Controllers
             }
 
             return Ok(newEmployee);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<AllEmployeeViewModel>>> GetProjectEmployees(int id)
+        {
+            var projectExist = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
+            if(projectExist == null) { return BadRequest(); }
+
+            var employees = await _context.EmployeesProjects.Where(ep => ep.ProjectId == id)
+                .Select(e => new AllEmployeeViewModel
+                {
+                    Id = e.EmployeeId,
+                    FirstName = e.Employee.FirstName,
+                    LastName = e.Employee.LastName,
+                    Department = e.Employee.Department.DepartmentName,
+                    JobTitle = e.Employee.JobTitle.JobName,
+                    Email = e.Employee.Email,
+                    ContactNumber = e.Employee.ContactNumber,
+                    Adress = e.Employee.Adress
+                }).ToListAsync();
+            return employees;
         }
 
         // DELETE: api/Employees/5

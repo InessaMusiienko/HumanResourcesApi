@@ -13,7 +13,7 @@ public partial class Project
 
     public int Duration { get; set; }
 
-    public DateTime? StartedOn { get; set; }
+    public DateTime StartedOn { get; set; }
 
     public string Status { get; set; } = null!;
 

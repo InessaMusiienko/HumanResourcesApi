@@ -82,7 +82,6 @@ namespace HumanResources.Controllers
                 TempData["errorMessage"] = ex.Message;
                 return View();
             }
-            //return View();
             return this.RedirectToAction("GetAllDepartments");
         }
     }

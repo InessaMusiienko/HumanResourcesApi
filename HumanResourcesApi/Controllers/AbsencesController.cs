@@ -2,9 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using HumanResourcesApi.Data;
 using HumanResourcesApi.Models.Entities;
-using HumanResourcesApi.Models.ApiModels;
-using HumanResourcesApi.Models;
-using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using HumanResources.Models;
 using System.Globalization;
@@ -123,6 +120,37 @@ namespace HumanResourcesApi.Controllers
             }
 
             absence.Status = "Approved";
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AbsenceExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var absence = await _context.Absences.FirstOrDefaultAsync(a => a.AbsenceId == id);
+
+            if (absence == null)
+            {
+                return BadRequest();
+            }
+
+            absence.Status = "Canceled";
 
             try
             {

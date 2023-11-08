@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices;
+using System.Security.Claims;
 using System.Text;
 
 namespace HumanResources.Controllers
@@ -33,6 +33,37 @@ namespace HumanResources.Controllers
             }
 
             return View(projectList);
+        }
+
+        [HttpGet]
+        public IActionResult AddEmployee(string projectId)
+        {
+            List<AllEmployeeViewModel> employeeList = new List<AllEmployeeViewModel>();
+            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/employees/getemployeesbyproject/" + projectId).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                employeeList = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
+            }
+
+            return View(employeeList);
+        }
+
+        [HttpPost]
+        public IActionResult AddEmployeeToProject(int id, int projectId)
+        {
+            var user = User.FindFirstValue(ClaimTypes.Email);
+            AllEmployeeViewModel employee = new AllEmployeeViewModel();
+            HttpResponseMessage response = _client
+            .GetAsync(_client.BaseAddress + $"/employees/getemployee/{id}").Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+            }
+            return View("AddEmployeeToProject", employee);
         }
 
         [HttpGet]
@@ -71,6 +102,29 @@ namespace HumanResources.Controllers
                 return View();
             }
             else { return BadRequest(); }
+        }
+
+        [HttpGet]
+        public IActionResult Details(string id)
+        {
+            try
+            {
+                List<AllEmployeeViewModel> employees = new List<AllEmployeeViewModel>();
+                HttpResponseMessage response = _client
+                    .GetAsync(_client.BaseAddress + $"/employees/getprojectemployees/{id}").Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ViewBag.ProjectId = id;
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    employees = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
+                }
+                return View(employees);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
         }
 
         [HttpGet]

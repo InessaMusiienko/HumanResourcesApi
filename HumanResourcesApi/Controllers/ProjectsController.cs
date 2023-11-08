@@ -36,7 +36,7 @@ namespace HumanResourcesApi.Controllers
                 Id = p.ProjectId,
                 ProjectName = p.ProjectName,
                 Duration = p.Duration,
-                StartedOn = p.StartedOn.ToString(),
+                StartedOn = p.StartedOn,
                 Status = p.Status
             }).ToListAsync();
         }
@@ -72,7 +72,7 @@ namespace HumanResourcesApi.Controllers
             //check started on 
 
             project.ProjectName = updatedproject.ProjectName;
-            project.StartedOn = DateTime.Parse(updatedproject.StartedOn);
+            project.StartedOn = updatedproject.StartedOn;
             project.Status = updatedproject.Status;
             project.Duration = updatedproject.Duration;
 
@@ -108,16 +108,16 @@ namespace HumanResourcesApi.Controllers
             if (projectAlreadyExist != null)
             {
                 return BadRequest();
-            }
-
-            var start = DateTime.ParseExact(project.StartedOn, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            } 
+                //DateTime.ParseExact(project.StartedOn, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+;
 
             var projectToAdd = new Project()
             {
                 ProjectName = project.ProjectName,
                 Duration = project.Duration,
                 Status = project.Status,
-                StartedOn = start,
+                StartedOn = project.StartedOn,
                 EmployeesProjects = new List<EmployeeProject>()
             };
 

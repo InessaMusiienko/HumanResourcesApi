@@ -182,7 +182,58 @@ namespace HumanResources.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return RedirectToAction("GetAllAbsence");
+                        return RedirectToAction("GetAllAbsences");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["errorMessage"] = ex.Message;
+                    return View();
+                }
+                return View();
+            }
+            else { return BadRequest(); }
+        }
+
+        [HttpGet]
+        public IActionResult Cancel(int id)
+        {
+            if (User.IsInRole("Hr"))
+            {
+                try
+                {
+                    AbsenceAllView absence = new AbsenceAllView();
+                    HttpResponseMessage response = _client
+                        .GetAsync(_client.BaseAddress + "/absences/getabsencebyid/" + id).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string data = response.Content.ReadAsStringAsync().Result;
+                        absence = JsonConvert.DeserializeObject<AbsenceAllView>(data);
+                    }
+                    return View(absence);
+                }
+                catch (Exception)
+                {
+                    return View();
+                }
+            }
+            else { return BadRequest(); }
+        }
+
+        [HttpPost, ActionName("Cancel")]
+        public IActionResult CancelConfirmed(int id)
+        {
+            if (User.IsInRole("Hr"))
+            {
+                try
+                {
+                    HttpResponseMessage response = _client.DeleteAsync
+                        (_client.BaseAddress + $"/absences/cancel/{id}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("GetAllAbsences");
                     }
                 }
                 catch (Exception ex)
@@ -218,10 +269,7 @@ namespace HumanResources.Controllers
                     return View();
                 }
             }
-            else
-            {
-                return BadRequest();
-            }
+            else { return BadRequest(); }
         }
 
         [HttpPost, ActionName("Delete")]
