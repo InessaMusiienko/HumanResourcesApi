@@ -54,7 +54,7 @@ namespace HumanResourcesApi.Controllers
 
         // GET: api/Absences/5
         [HttpGet("{user}")]
-        public async Task<ActionResult<IEnumerable<AbsencePostModel>>> GetAbsence(string user)
+        public async Task<ActionResult<IEnumerable<AbsencePostModel>>> GetAbsences(string user)
         {
             if (_context.Absences == null)
             {

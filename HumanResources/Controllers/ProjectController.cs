@@ -51,7 +51,7 @@ namespace HumanResources.Controllers
             return View(employeeList);
         }
 
-        [HttpGet] ///AddEmployeeToProject/3?projectId=7
+        [HttpGet] 
         public IActionResult AddEmployeeToProject(int id, int projectId)
         {
             EmployeeProjectDataModel model = new EmployeeProjectDataModel
@@ -59,12 +59,7 @@ namespace HumanResources.Controllers
                 EmployeeId = id,
                 ProjectId = projectId
             };
-            //var parameters = new List<KeyValuePair<string, string>>
-            //{
-            //    new KeyValuePair<string, string>("employeeId", $"{id}"),
-            //    new KeyValuePair<string, string>("projectId", $"{projectId}"),
-
-            //};
+            
             string data = JsonConvert.SerializeObject(model);
             StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage response = _client

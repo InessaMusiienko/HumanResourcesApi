@@ -29,6 +29,8 @@ namespace HumanResourcesApi
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<CustomApiKeyMiddleware>();
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

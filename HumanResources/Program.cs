@@ -1,5 +1,7 @@
 using HumanResources.Data;
+using HumanResources.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.DotNet.Scaffolding.Shared.ProjectModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace HumanResources
@@ -38,8 +40,9 @@ namespace HumanResources
                 //user settings
                 options.User.RequireUniqueEmail = false;
             });
-
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<HttpService, HttpService>();
 
             var app = builder.Build();
 
