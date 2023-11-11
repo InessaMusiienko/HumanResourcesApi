@@ -73,7 +73,7 @@ namespace HumanResources.Controllers
             if (response.IsSuccessStatusCode)
             {
                 ViewBag.ProjectId = projectId;
-                return RedirectToAction("Details");
+                return RedirectToAction("Details", model.ProjectId);
             }
             return RedirectToAction("GetAllProjects");
         }
