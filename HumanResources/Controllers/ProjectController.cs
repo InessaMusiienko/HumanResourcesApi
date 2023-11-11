@@ -43,6 +43,7 @@ namespace HumanResources.Controllers
 
             if (response.IsSuccessStatusCode)
             {
+                ViewBag.ProjectId = projectId;
                 string data = response.Content.ReadAsStringAsync().Result;
                 employeeList = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
             }
@@ -50,20 +51,31 @@ namespace HumanResources.Controllers
             return View(employeeList);
         }
 
-        [HttpPost]
+        [HttpGet] ///AddEmployeeToProject/3?projectId=7
         public IActionResult AddEmployeeToProject(int id, int projectId)
         {
-            var user = User.FindFirstValue(ClaimTypes.Email);
-            AllEmployeeViewModel employee = new AllEmployeeViewModel();
+            EmployeeProjectDataModel model = new EmployeeProjectDataModel
+            {
+                EmployeeId = id,
+                ProjectId = projectId
+            };
+            //var parameters = new List<KeyValuePair<string, string>>
+            //{
+            //    new KeyValuePair<string, string>("employeeId", $"{id}"),
+            //    new KeyValuePair<string, string>("projectId", $"{projectId}"),
+
+            //};
+            string data = JsonConvert.SerializeObject(model);
+            StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
             HttpResponseMessage response = _client
-            .GetAsync(_client.BaseAddress + $"/employees/getemployee/{id}").Result;
+            .PostAsync(_client.BaseAddress + "/projects/addemployeetoproject", content).Result;
 
             if (response.IsSuccessStatusCode)
             {
-                string data = response.Content.ReadAsStringAsync().Result;
-                employee = JsonConvert.DeserializeObject<AllEmployeeViewModel>(data);
+                ViewBag.ProjectId = projectId;
+                return RedirectToAction("Details");
             }
-            return View("AddEmployeeToProject", employee);
+            return RedirectToAction("GetAllProjects");
         }
 
         [HttpGet]
@@ -126,6 +138,12 @@ namespace HumanResources.Controllers
                 return View();
             }
         }
+
+        //[HttpGet]
+        //public IActionResult DeleteEmployeeFromProject(int id, int projectId)
+        //{
+
+        //}
 
         [HttpGet]
         public IActionResult Delete(int id)

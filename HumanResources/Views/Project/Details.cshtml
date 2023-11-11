@@ -6,9 +6,12 @@
 
 <h1>Details</h1>
 
-<p>
-    <a asp-action="AddEmployee" asp-route-projectId=@ViewBag.ProjectId>Add employee to project</a>
-</p>
+@if (User.IsInRole("Hr"))
+{
+    <p>
+        <a asp-action="AddEmployee" asp-route-projectId=@ViewBag.ProjectId>Add employee to project</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -60,9 +63,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Adress)
             </td>
-            <td>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+            @*<td>
+                <a asp-action="DeleteEmployeeFromProject" asp-route-projectId=@ViewBag.ProjectId asp-route-id="@item.Id">Delete</a>
+            </td>*@
         </tr>
 }
     </tbody>

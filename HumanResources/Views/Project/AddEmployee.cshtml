@@ -56,7 +56,7 @@
                 @Html.DisplayFor(modelItem => item.Adress)
             </td>
             <td>
-                <a asp-action="AddEmployeeToProject" asp-route-id="@item.Id">Add</a>
+                <a asp-action="AddEmployeeToProject" asp-route-id="@item.Id" asp-route-projectId=@ViewBag.ProjectId>Add</a>
             </td>
         </tr>
 }

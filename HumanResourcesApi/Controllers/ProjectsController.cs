@@ -135,6 +135,25 @@ namespace HumanResourcesApi.Controllers
             return RedirectToAction("GetProjects");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddEmployeeToProject(EmployeeProjectDataModel model)
+        {
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == model.EmployeeId);
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == model.ProjectId);
+
+            if (employee == null || project == null) { return BadRequest(); }
+            var empPro = new EmployeeProject
+            {
+                EmployeeId = model.EmployeeId,
+                ProjectId = model.ProjectId
+            };
+
+            _context.EmployeesProjects.Add(empPro);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         // DELETE: api/Projects/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
