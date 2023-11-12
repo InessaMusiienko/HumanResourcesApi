@@ -43,6 +43,18 @@ namespace HumanResources.Services
             return true;
         }
 
+        public bool Put<T>(string route, T model)
+        {
+            string data = JsonConvert.SerializeObject(model);
+            StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = _client.PutAsync(_client.BaseAddress + route, content).Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public bool Delete(string route)
         {
             HttpResponseMessage response = _client.DeleteAsync(_client.BaseAddress + route).Result;

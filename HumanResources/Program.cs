@@ -92,17 +92,6 @@ namespace HumanResources
                 var user = await userManager.FindByEmailAsync(email);
                 await userManager.AddToRoleAsync(user, "Hr");
 
-
-                //if(await userManager.FindByEmailAsync(email)==null)
-                //{
-                //    var user = new IdentityUser();
-                //    user.UserName = "hrAccount";
-                //    user.Email = email;
-
-                //    await userManager.CreateAsync(user, password);
-
-                //    await userManager.AddToRoleAsync(user, "Hr");
-                //}
             }
 
             app.Run();

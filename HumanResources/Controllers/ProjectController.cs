@@ -1,4 +1,5 @@
 ﻿using HumanResources.Models;
+using HumanResources.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,240 +11,159 @@ namespace HumanResources.Controllers
     [Authorize]
     public class ProjectController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:7175/api");
-        private readonly HttpClient _client;
+        private HttpService _http;
 
-        public ProjectController()
+        public ProjectController(HttpService http)
         {
-            _client = new HttpClient();
-            _client.BaseAddress = baseAddress;
+            this._http = http;
         }
 
-        //[Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult GetAllProjects()
         {
-            List<ProjectViewModel> projectList = new List<ProjectViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/projects/GetProjects").Result;
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+            string apiRoute = "/projects/getprojects";
 
-            if (response.IsSuccessStatusCode)
-            {
-                string data = response.Content.ReadAsStringAsync().Result;
-                projectList = JsonConvert.DeserializeObject<List<ProjectViewModel>>(data);
-            }
+            var projectList = _http.Get<List<ProjectViewModel>>(apiRoute);
 
             return View(projectList);
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult AddEmployee(string projectId)
         {
-            List<AllEmployeeViewModel> employeeList = new List<AllEmployeeViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/employees/getemployeesbyproject/" + projectId).Result;
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+            var apiRoute = $"/employees/getemployeesbyproject/{projectId}";
 
-            if (response.IsSuccessStatusCode)
-            {
-                ViewBag.ProjectId = projectId;
-                string data = response.Content.ReadAsStringAsync().Result;
-                employeeList = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
-            }
-
+            var employeeList = _http.Get<List<AllEmployeeViewModel>>(apiRoute);
+            
+            ViewBag.ProjectId = projectId;
+            
             return View(employeeList);
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet] 
-        public IActionResult AddEmployeeToProject(int id, int projectId)
+        public IActionResult AddEmployeeToProject(int id, int projectId) //check
         {
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+
             EmployeeProjectDataModel model = new EmployeeProjectDataModel
             {
                 EmployeeId = id,
                 ProjectId = projectId
             };
-            
-            string data = JsonConvert.SerializeObject(model);
-            StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-            HttpResponseMessage response = _client
-            .PostAsync(_client.BaseAddress + "/projects/addemployeetoproject", content).Result;
 
-            if (response.IsSuccessStatusCode)
+            var apiRoute = "/projects/addemployeetoproject";
+            var success = _http.Post<EmployeeProjectDataModel>(apiRoute, model);
+
+            if (success)
             {
                 ViewBag.ProjectId = projectId;
                 return RedirectToAction("Details", model.ProjectId);
             }
+
             return RedirectToAction("GetAllProjects");
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult Create()
         {
-            if (User.IsInRole("Hr"))
-            {
-                return View();
-            }
-            else { return BadRequest(); }
+            return View();
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpPost]
         public IActionResult Create(ProjectViewModel model)
         {
-            if (User.IsInRole("Hr"))
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+
+            var apiRoute = "/projects/postproject";
+            var success = _http.Post<ProjectViewModel>(apiRoute, model);
+
+            if (success)
             {
-                try
-                {
-                    string data = JsonConvert.SerializeObject(model);
-                    StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = _client
-                        .PostAsync(_client.BaseAddress + "/projects/postproject", content).Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("GetAllProjects");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TempData["errorMessage"] = ex.Message;
-                    return View();
-                }
-                return View();
+                return RedirectToAction("GetAllProjects");
             }
-            else { return BadRequest(); }
+
+            return View();            
         }
 
         [HttpGet]
         public IActionResult Details(string id)
         {
-            try
-            {
-                List<AllEmployeeViewModel> employees = new List<AllEmployeeViewModel>();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + $"/employees/getprojectemployees/{id}").Result;
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
 
-                if (response.IsSuccessStatusCode)
-                {
-                    ViewBag.ProjectId = id;
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    employees = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
-                }
-                return View(employees);
-            }
-            catch (Exception)
-            {
-                return View();
-            }
+            var apiRoute = $"/employees/getprojectemployees/{id}";
+            var employees = _http.Get<List<AllEmployeeViewModel>>(apiRoute);
+
+            ViewBag.ProjectId = id;
+            return View(employees);
         }
 
-        //[HttpGet]
-        //public IActionResult DeleteEmployeeFromProject(int id, int projectId)
-        //{
-
-        //}
-
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            if (User.IsInRole("Hr"))
-            {
-                try
-                {
-                    ProjectViewModel project = new ProjectViewModel();
-                    HttpResponseMessage response = _client
-                        .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
+            var apiRoute = $"/projects/getproject/{id}";
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string data = response.Content.ReadAsStringAsync().Result;
-                        project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
-                    }
-                    return View(project);
-                }
-                catch (Exception)
-                {
-                    return View();
-                }
+            var project = _http.Get<ProjectViewModel>(apiRoute);
+
+            if (project != null)
+            {
+                return View(project);
             }
-            else { return BadRequest(); }
+
+            return View();
+
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (User.IsInRole("Hr"))
-            {
-                try
-                {
-                    HttpResponseMessage responsw = _client
-                            .DeleteAsync(_client.BaseAddress + "/projects/delete/" + id).Result;
+            var apiRoute = $"/projects/delete/{id}";
 
-                    if (responsw.IsSuccessStatusCode)
-                    {
-                        TempData["successMessage"] = "Project deleted.";
-                        return RedirectToAction("GetAllProjects");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TempData["errorMessage"] = ex.Message;
-                    return View();
-                }
-                return View();
+            var success = _http.Delete(apiRoute);
+
+            if (success)
+            {
+                return RedirectToAction("GetAllProjects");
             }
-            else { return BadRequest(); }
+
+            return View();
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.IsInRole("Hr"))
-            {
-                try
-                {
-                    ProjectViewModel project = new ProjectViewModel();
-                    HttpResponseMessage response = _client
-                        .GetAsync(_client.BaseAddress + "/projects/getproject/" + id).Result;
+            var apiRoute = $"/projects/getproject/{id}";
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string data = response.Content.ReadAsStringAsync().Result;
-                        project = JsonConvert.DeserializeObject<ProjectViewModel>(data);
-                    }
-                    return View(project);
-                }
-                catch (Exception)
-                {
-                    return View();
-                }
+            var project = _http.Get<ProjectViewModel>(apiRoute);
+            if (project != null)
+            {
+                return View(project);
             }
-            return BadRequest();
+
+            return View();
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpPost]
         public IActionResult Edit(int id, ProjectViewModel model)
         {
-            if (User.IsInRole("Hr"))
-            {
-                try
-                {
-                    string data = JsonConvert.SerializeObject(model);
-                    StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = _client
-                        .PutAsync(_client.BaseAddress + $"/projects/putproject/{id}", content).Result;
+            var apiRoute = $"/projects/putproject/{id}";
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        TempData["successMessage"] = "Project info updated";
-                        return RedirectToAction("GetAllProjects");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TempData["errorMessage"] = ex.Message;
-                    return View();
-                }
-                return View();
+            var success = _http.Put<ProjectViewModel>(apiRoute, model);
+            if (success)
+            {
+                return RedirectToAction("GetAllProjects");
             }
-            return BadRequest();
+
+            return View();
         }
     }
 }

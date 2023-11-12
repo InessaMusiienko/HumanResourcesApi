@@ -1,88 +1,65 @@
 ﻿using HumanResources.Models;
+using HumanResources.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace HumanResources.Controllers
 {
     [Authorize]
     public class DepartmentController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:7175/api");
-        private readonly HttpClient _client;
+        private HttpService _http;
 
-        public DepartmentController()
+        public DepartmentController(HttpService http)
         {
-            _client = new HttpClient();
-            _client.BaseAddress = baseAddress;
+            this._http = http;
         }
 
         [HttpGet]
         public IActionResult GetAllDepartments(string SearchString="")
         {
-            List<DepartmentViewModel> departmentList = new List<DepartmentViewModel>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + $"/departments/getdepartments?searchstring={SearchString}").Result;
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+            string apiRoute = $"/departments/getdepartments?searchstring={SearchString}";
 
-            if (response.IsSuccessStatusCode)
-            {
-                string data = response.Content.ReadAsStringAsync().Result;
-                departmentList = JsonConvert.DeserializeObject<List<DepartmentViewModel>>(data);
-            }
+            var departmentList = _http.Get<List<DepartmentViewModel>>(apiRoute);
 
             return View(departmentList);
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult Details(string id)
         {
-            try
-            {
-                List<AllEmployeeViewModel> employees = new List<AllEmployeeViewModel>();
-                HttpResponseMessage response = _client
-                    .GetAsync(_client.BaseAddress + $"/employees/getdepartmentemployees/{id}").Result;
+            if (!User.Identity.IsAuthenticated) { return BadRequest(); }
+            var apiRoute = $"/employees/getdepartmentemployees/{id}";
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    employees = JsonConvert.DeserializeObject<List<AllEmployeeViewModel>>(data);
-                }
-                return View(employees);
-            }
-            catch (Exception)
-            {
-                return View();
-            }
+            var employees = _http.Get<List<AllEmployeeViewModel>>(apiRoute);
+               
+            return View(employees);
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Hr")]
         [HttpPost]
         public IActionResult CreateDepartment(DepartmentViewModel model)
         {
-            try
-            {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+            var apiRoute = "/departments/postdepartment";
+            var success = _http.Post<DepartmentViewModel>(apiRoute, model);
 
-                HttpResponseMessage response = _client
-                    .PostAsync(_client.BaseAddress + "/departments/postdepartment", content).Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["successMessage"] = "Department Created.";
-                    return RedirectToAction("GetAllDepartments");
-                }
-            }
-            catch(Exception ex)
+            if (success)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View();
+                return RedirectToAction("GetAllDepartments");
             }
-            return this.RedirectToAction("GetAllDepartments");
+
+            return RedirectToAction("GetAllDepartments");
         }
     }
 }
